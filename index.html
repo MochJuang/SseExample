@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<h2>List</h2>
+    <ul id="list"></ul>
+<body>
+
+    <script>
+        function randomNum(min, max) {
+            return Math.floor(Math.random() * (max - min)) + min; // You can remove the Math.floor if you don't want it to be an integer
+        }
+
+        const sse = new EventSource("http://127.0.0.1:8080/stream?id=" + randomNum(1, 100000))
+
+        sse.onopen = function() {
+            console.log('connected')
+        }
+
+        sse.onmessage = function(event) {
+            console.log(event)
+            const newElement = document.createElement("li");
+            const eventList = document.getElementById("list");
+
+            newElement.textContent = `message: ${event.data}`;
+            console.log(newElement)
+            eventList.appendChild(newElement);
+        }
+
+        sse.onerror = function(err) {
+            console.log(err)
+        }
+
+    
+
+    </script>
+
+</body>
+</html>

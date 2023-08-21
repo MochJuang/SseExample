@@ -73,11 +73,9 @@ func main() {
 	counter := 1
 	manager := NewManager()
 	go manager.Run()
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
 	fmt.Println("start")
-	block := make(chan struct{})
+	// block := make(chan struct{})
 
 	http.HandleFunc("/stream", func(w http.ResponseWriter, r *http.Request) {
 
@@ -85,7 +83,8 @@ func main() {
 		w.Header().Set("Cache-Control", "no-cache")
 		w.Header().Set("Connection", "keep-alive")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
 		clientId := r.URL.Query().Get("id")
 		var client = &SSEClient{
 			ClientId: clientId,
@@ -98,9 +97,9 @@ func main() {
 
 		manager.register <- client
 
-		go client.write()
+		client.write()
 
-		block <- struct{}{}
+		// block <- struct{}{}
 	})
 
 	http.HandleFunc("/send", func(w http.ResponseWriter, r *http.Request) {
@@ -121,4 +120,8 @@ func main() {
 	})
 
 	http.ListenAndServe(":8080", nil)
+}
+
+func Sum(a int, b int) int {
+	return a + b
 }
